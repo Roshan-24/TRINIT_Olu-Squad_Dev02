@@ -26,9 +26,9 @@ export const login = (req, res) => {
       hashedEmail: crypto.createHash('md5').update(req.user.email).digest('hex')
     };
 
-    res.json({ accessToken: signJwt(payload) });
+    return res.json({ accessToken: signJwt(payload) });
   } catch (err) {
-    res.status(500).json({ message: 'Something went wrong!' });
+    return res.status(500).json({ message: 'Something went wrong!' });
   }
 };
 
@@ -43,8 +43,8 @@ export const register = async (req, res) => {
       }
     });
 
-    res.json({ message: 'User successfully created' });
+    return res.json({ message: 'User successfully created' });
   } catch (err) {
-    res.status(500).json({ message: 'Something went wrong!' });
+    return res.status(500).json({ message: 'Something went wrong!' });
   }
 };

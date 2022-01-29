@@ -8,6 +8,6 @@ projectRouter.get('/:id', getProjectById);
 
 projectRouter.post('/new', jwtAuthGuard, createNewProject);
 
-projectRouter.get('/', jwtAuthGuard, listOrgProjects);
+projectRouter.get('/getByOrgId', jwtAuthGuard, listOrgProjects);
 
 export default projectRouter;

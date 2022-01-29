@@ -47,9 +47,9 @@ const LoginForm = () => {
       },
       onError: error => {
         error.response &&
-          error.response.status !== 401 &&
+          error.response.status !== 500 &&
           toast({
-            description: "Something went wrong",
+            description: error.response.data,
             status: "error"
           });
       }

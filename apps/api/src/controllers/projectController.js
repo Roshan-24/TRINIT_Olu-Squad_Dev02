@@ -4,15 +4,29 @@ export const createNewProject = async (req, res) => {
   try {
     const project = await prisma.project.create({
       data: {
-        name: req.projectName,
-        admins: [req.user.id],
-        members: [req.user.id],
-        organizationId: req.query.orgId
+        name: req.body.name,
+        description: req.body.description,
+        organization: {
+          connect: {
+            id: parseInt(req.body.orgId)
+          }
+        },
+        admins: {
+          connect: {
+            id: parseInt(req.user.id)
+          }
+        },
+        members: {
+          connect: {
+            id: parseInt(req.user.id)
+          }
+        }
       }
     });
-    res.status(201).json({ project });
+    return res.status(201).json({ project });
   } catch (err) {
-    res.status(500).json({ message: 'Something went wrong!' });
+    console.log(err);
+    return res.status(500).json({ message: 'Something went wrong!' });
   }
 };
 
@@ -23,9 +37,9 @@ export const listOrgProjects = async (req, res) => {
         organizationId: parseInt(req.query.orgId)
       }
     });
-    res.status(200).json({ projects });
+    return res.status(200).json({ projects });
   } catch (err) {
-    res.status(500).json({ message: 'Something went wrong!' });
+    return res.status(500).json({ message: 'Something went wrong!' });
   }
 };
 

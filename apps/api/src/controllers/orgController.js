@@ -4,14 +4,24 @@ export const createNewOrg = async (req, res) => {
   try {
     const organization = await prisma.organization.create({
       data: {
-        name: req.orgName,
-        owners: [req.user.id],
-        members: [req.user.id]
+        name: req.body.name,
+        description: req.body.description,
+        owners: {
+          connect: {
+            id: req.user.id
+          }
+        },
+        members: {
+          connect: {
+            id: req.user.id
+          }
+        }
       }
     });
-    res.status(201).json({ organization });
+    return res.status(201).json({ organization });
   } catch (err) {
-    res.status(500).json({ message: 'Something went wrong!' });
+    console.log(err);
+    return res.status(500).json({ message: 'Something went wrong!' });
   }
 };
 
@@ -34,10 +44,9 @@ export const listUserOrgs = async (req, res) => {
         }
       }
     });
-    res.status(200).json({ organizations });
+    return res.status(200).json({ organizations });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: 'Something went wrong!' });
+    return res.status(500).json({ message: 'Something went wrong!' });
   }
 };
 
@@ -45,11 +54,14 @@ export const getOrgById = async (req, res) => {
   console.log(req.query.orgId);
   try {
     const organization = await prisma.organization.findUnique({
-      where: { id: parseInt(req.query.orgId) }
+      where: { id: parseInt(req.params.orgId) },
+      include: {
+        owners: true,
+        members: true
+      }
     });
-    res.status(200).json({ organization });
+    return res.status(200).json({ organization });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: 'Something went wrong!' });
+    return res.status(500).json({ message: 'Something went wrong!' });
   }
 };
