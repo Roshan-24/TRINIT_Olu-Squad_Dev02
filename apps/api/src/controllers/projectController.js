@@ -5,7 +5,8 @@ export const createNewProject = async (req, res) => {
     const project = await prisma.project.create({
       data: {
         name: req.projectName,
-        admins: [req.user.id]
+        admins: [req.user.id],
+        organizationId: req.query.orgId
       }
     });
     res.status(201).json({ project });
