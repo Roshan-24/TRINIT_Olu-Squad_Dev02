@@ -21,6 +21,11 @@ export const useAxios = () => {
         toast({
           description: "Unable to receive a response from the server"
         });
+      else if (error.response.status === 500)
+        toast({
+          description: "Something went wrong!",
+          status: "error"
+        });
       throw error;
     }
   );

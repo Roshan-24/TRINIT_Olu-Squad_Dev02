@@ -28,17 +28,19 @@ model User {
 }
 
 model Organization {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
-  owners    User[]
-  projects  Project[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String
+  owners      User[]
+  projects    Project[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Project {
   id             Int          @id @default(autoincrement())
   name           String
+  description    String
   organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId Int
   admins         User[]       @relation("Project_adminToUser")
@@ -54,6 +56,7 @@ enum BugStatus {
   APPROVED
   ASSIGNED
   RESOLVED
+  CLOSED
 }
 
 model BugCategory {
