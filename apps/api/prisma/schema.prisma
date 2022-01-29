@@ -12,22 +12,22 @@ datasource db {
 }
 
 model User {
-  id                 Int           @id @default(autoincrement())
-  email              String        @unique
+  id                 Int            @id @default(autoincrement())
+  email              String         @unique
   password           String
   firstName          String
   lastName           String
-  organizationsOwned Orgnization[]
-  projectsOwned      Project[]     @relation("Project_adminToUser")
-  projectMembers     Project[]     @relation("Project_memberToUser")
-  bugsAssigned       Bug[]         @relation("Bug_assignedUsers")
+  organizationsOwned Organization[]
+  projectsOwned      Project[]      @relation("Project_adminToUser")
+  projectMembers     Project[]      @relation("Project_memberToUser")
+  bugsAssigned       Bug[]          @relation("Bug_assignedUsers")
   postsCreated       ThreadPost[]
   Bug                Bug[]
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 }
 
-model Orgnization {
+model Organization {
   id        Int       @id @default(autoincrement())
   name      String    @unique
   owners    User[]
@@ -37,16 +37,16 @@ model Orgnization {
 }
 
 model Project {
-  id            Int         @id @default(autoincrement())
-  name          String
-  organization  Orgnization @relation(fields: [orgnizationId], references: [id])
-  orgnizationId Int
-  admins        User[]      @relation("Project_adminToUser")
-  members       User[]      @relation("Project_memberToUser")
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id             Int          @id @default(autoincrement())
+  name           String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId Int
+  admins         User[]       @relation("Project_adminToUser")
+  members        User[]       @relation("Project_memberToUser")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  @@unique([orgnizationId, name])
+  @@unique([organizationId, name])
 }
 
 enum BugStatus {
