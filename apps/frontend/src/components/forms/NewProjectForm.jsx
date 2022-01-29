@@ -16,7 +16,7 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import { useAxios } from "../../config/axios";
 
-const NewProjectForm = ({ orgId }) => {
+const NewProjectForm = ({ orgId, refetchProjects }) => {
   const {
     handleSubmit,
     register,
@@ -35,6 +35,7 @@ const NewProjectForm = ({ orgId }) => {
           description: `Project ${data.data.project.name} successfully created`,
           status: "success"
         });
+        refetchProjects();
       }
     }
   );

@@ -20,17 +20,19 @@ import {
   Stack,
   useDisclosure
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ProjectCard from "../components/ProjectCard";
 import { navbarHeight } from "../config/constants";
 import { useAxios } from "../config/axios";
 import MemberList from "../components/MemberList";
 import NewProjectForm from "../components/forms/NewProjectForm";
+import { userContext } from "../contexts/UserContext";
 
 const OrganizationDashboard = () => {
   const { orgId } = useParams();
+  const { user } = useContext(userContext);
 
   const { isOpen, onToggle, onClose } = useDisclosure();
   const { isOpen: isModalOpen, onToggle: onModalToggle, onClose: onModalClose } = useDisclosure();
@@ -41,15 +43,43 @@ const OrganizationDashboard = () => {
   const [isProjectsLoading, setProjectsLoading] = useState(true);
 
   const axiosInstance = useAxios();
+  const navigate = useNavigate();
 
   useEffect(async () => {
     setOrgLoading(true);
     setProjectsLoading(true);
     setOrgData(await axiosInstance.get(`/org/${orgId}`));
-    setProjectsData(await axiosInstance.get(`/project/getByOrgId?orgId=${orgId}`));
+    setProjectsData(await axiosInstance.get(`/project/getByOrgId/${orgId}`));
     setProjectsLoading(false);
     setOrgLoading(false);
   }, []);
+
+  const refetchProjects = async () => {
+    setProjectsLoading(true);
+    setProjectsData(await axiosInstance.get(`/project/getByOrgId/${orgId}`));
+    setProjectsLoading(false);
+  };
+
+  const refetchOrgs = async () => {
+    setOrgLoading(true);
+    setOrgData(await axiosInstance.get(`/org/${orgId}`));
+    setOrgLoading(false);
+  };
+
+  const addToOrg = async email => {
+    await axiosInstance.post(`/org/${orgId}/add`, { email });
+    await refetchOrgs();
+  };
+
+  const makeOrgOwner = async userId => {
+    await axiosInstance.post(`/org/${orgId}/makeOwner`, { userId });
+    await refetchOrgs();
+  };
+
+  const removeFromOrg = async userId => {
+    await axiosInstance.post(`/org/${orgId}/remove`, { userId });
+    await refetchOrgs();
+  };
 
   const projects = projectsData?.data?.projects;
   const org = orgData?.data?.organization;
@@ -92,6 +122,7 @@ const OrganizationDashboard = () => {
                   key={project.id}
                   name={project.name}
                   description={project.description}
+                  onClick={() => navigate(`/project/${project.id}`)}
                 />
               ))}
             </SimpleGrid>
@@ -103,7 +134,7 @@ const OrganizationDashboard = () => {
         <ModalContent p={6} minW={"550px"}>
           <ModalCloseButton />
           <ModalBody>
-            <NewProjectForm orgId={orgId} />
+            <NewProjectForm orgId={orgId} refetchProjects={refetchProjects} />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -112,7 +143,14 @@ const OrganizationDashboard = () => {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerBody>
-            <MemberList admins={org?.owners ?? []} members={org?.members ?? []} />
+            <MemberList
+              isUserAdmin={org?.owners.some(owner => owner.id === user.id)}
+              promoteFn={makeOrgOwner}
+              kickFn={removeFromOrg}
+              addMembersFn={addToOrg}
+              admins={org?.owners ?? []}
+              members={org?.members ?? []}
+            />
           </DrawerBody>
         </DrawerContent>
       </Drawer>

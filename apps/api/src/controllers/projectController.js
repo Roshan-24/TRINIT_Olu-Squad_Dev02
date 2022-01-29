@@ -34,7 +34,7 @@ export const listOrgProjects = async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
       where: {
-        organizationId: parseInt(req.query.orgId)
+        organizationId: parseInt(req.params.orgId)
       }
     });
     return res.status(200).json({ projects });
@@ -47,7 +47,7 @@ export const getProjectById = async (req, res) => {
   try {
     const curProject = await prisma.project.findUnique({
       where: {
-        id: Number(req.params['id'])
+        id: Number(req.params.id)
       },
       include: {
         organization: true,

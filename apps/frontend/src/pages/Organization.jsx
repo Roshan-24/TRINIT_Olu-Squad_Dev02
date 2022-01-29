@@ -31,7 +31,7 @@ const Organization = () => {
 
   const axiosInstance = useAxios();
 
-  const { data, isLoading } = useQuery("userOrgs", () => axiosInstance({ url: "/org" }));
+  const { data, isLoading } = useQuery("userOrgs", () => axiosInstance({ url: "/org/user" }));
 
   const navigate = useNavigate();
 
@@ -40,14 +40,13 @@ const Organization = () => {
       <Navbar />
       <Container maxW={"container.lg"}>
         <Box w={"full"} mb={8} height={navbarHeight} />
-        <Stack
-          direction={["column", "column", "row"]}
-          align={["center", "center", "end"]}
-          mb={8}
-          alignItems={"end"}
-        >
+        <Stack direction={["column", "column", "row"]} align={["center", "center", "end"]} mb={8}>
           <Box>
-            <Heading fontSize={"xl"} fontWeight={"normal"}>
+            <Heading
+              fontSize={"xl"}
+              fontWeight={"normal"}
+              textAlign={["center", "center", "start"]}
+            >
               Welcome, {user.firstName}
             </Heading>
             <Heading fontWeight={"semibold"}>Here are your organizations</Heading>

@@ -27,14 +27,20 @@ export const createNewOrg = async (req, res) => {
 
 export const listUserOrgs = async (req, res) => {
   try {
-    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
     const organizations = await prisma.organization.findMany({
       where: {
-        owners: {
-          every: {
-            id: user.id
+        OR: [
+          {
+            owners: {
+              some: { id: req.user.id }
+            }
+          },
+          {
+            members: {
+              some: { id: req.user.id }
+            }
           }
-        }
+        ]
       },
       include: {
         _count: {
@@ -61,6 +67,60 @@ export const getOrgById = async (req, res) => {
       }
     });
     return res.status(200).json({ organization });
+  } catch (err) {
+    return res.status(500).json({ message: 'Something went wrong!' });
+  }
+};
+
+export const addUserToOrg = async (req, res) => {
+  try {
+    await prisma.organization.update({
+      where: { id: parseInt(req.params.orgId) },
+      data: {
+        members: {
+          connect: {
+            email: req.body.email
+          }
+        }
+      }
+    });
+    return res.status(200).json({ message: 'User added to organization' });
+  } catch (err) {
+    return res.status(500).json({ message: 'Something went wrong!' });
+  }
+};
+
+export const makeOrgAdmin = async (req, res) => {
+  try {
+    await prisma.organization.update({
+      where: { id: parseInt(req.params.orgId) },
+      data: {
+        owners: {
+          connect: {
+            id: req.body.userId
+          }
+        }
+      }
+    });
+    return res.status(200).json({ message: 'User added to organization' });
+  } catch (err) {
+    return res.status(500).json({ message: 'Something went wrong!' });
+  }
+};
+
+export const removeFromOrg = async (req, res) => {
+  try {
+    await prisma.organization.update({
+      where: { id: parseInt(req.params.orgId) },
+      data: {
+        members: {
+          disconnect: {
+            id: req.body.userId
+          }
+        }
+      }
+    });
+    return res.status(200).json({ message: 'User removed from organization' });
   } catch (err) {
     return res.status(500).json({ message: 'Something went wrong!' });
   }
