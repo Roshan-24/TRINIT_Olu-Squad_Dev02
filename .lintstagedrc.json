@@ -1,0 +1,12 @@
+{
+  "apps/frontend/**/*.{js,jsx,json,*rc}": [
+    "yarn workspace @bug-tracker/frontend format"
+  ],
+  "apps/frontend/**/*.{js,jsx}": [
+    "yarn workspace @bug-tracker/frontend lint:fix"
+  ],
+  "apps/api/**/*.{js,json,*rc}": ["yarn workspace @bug-tracker/api format:js"],
+  "apps/api/prisma/schema.prisma": [
+    "yarn workspace @bug-tracker/api format:prisma"
+  ]
+}
