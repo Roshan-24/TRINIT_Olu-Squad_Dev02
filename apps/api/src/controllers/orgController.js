@@ -42,9 +42,10 @@ export const listUserOrgs = async (req, res) => {
 };
 
 export const getOrgById = async (req, res) => {
+  console.log(req.query.orgId);
   try {
     const organization = await prisma.organization.findUnique({
-      where: { id: req.query.orgId }
+      where: { id: parseInt(req.query.orgId) }
     });
     res.status(200).json({ organization });
   } catch (err) {

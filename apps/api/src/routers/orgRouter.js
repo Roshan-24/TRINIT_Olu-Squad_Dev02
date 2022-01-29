@@ -10,8 +10,8 @@ const orgRouter = express.Router();
 
 orgRouter.post('/new', jwtAuthGuard, createNewOrg);
 
-orgRouter.get('/', jwtAuthGuard, listUserOrgs);
+orgRouter.get('/user', jwtAuthGuard, listUserOrgs);
 
-orgRouter.get('/:orgId', jwtAuthGuard, getOrgById);
+orgRouter.get('/org', jwtAuthGuard, getOrgById);
 
 export default orgRouter;

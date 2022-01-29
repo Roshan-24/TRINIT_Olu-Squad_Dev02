@@ -21,7 +21,17 @@ export const createNewBug = async (req, res) => {
         description: req.body.description
       }
     });
-    res.status(201).json({ bug });
+    const thread = await prisma.thread.create({
+      data: {
+        bug: {
+          connect: {
+            id: parseInt(bug.id)
+          }
+        }
+      }
+    });
+
+    res.status(201).json({ bug, thread });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Something went wrong!' });

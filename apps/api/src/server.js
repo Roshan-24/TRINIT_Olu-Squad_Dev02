@@ -4,6 +4,7 @@ import authRouter from './routers/authRouter';
 import projectRouter from './routers/projectRouter';
 import orgRouter from './routers/orgRouter';
 import bugRouter from './routers/bugRouter';
+import threadRouter from './routers/threadRouter';
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(authRouter);
 app.use('/org', orgRouter);
 app.use('/project', projectRouter);
 app.use('/bug', bugRouter);
+app.use('/thread', threadRouter);
 
 app.listen(process.env.PORT || 4000, () =>
   console.log(`Server running at port ${process.env.PORT || 4000}\nOrz`)
