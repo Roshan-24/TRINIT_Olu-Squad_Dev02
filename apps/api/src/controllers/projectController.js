@@ -65,3 +65,23 @@ export const getProjectById = async (req, res) => {
     res.status(404).json({ message: 'Project not found' });
   }
 };
+
+export const createNewList = async (req, res) => {
+  try {
+    const { listName, projectId } = req.body;
+    const bugCategory = await prisma.bugCategory.create({
+      data: {
+        name: listName,
+        project: {
+          connect: {
+            id: parseInt(projectId)
+          }
+        }
+      }
+    });
+    res.status(201).json({ bugCategory });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Something went wrong!' });
+  }
+};

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { useMutation, useQuery } from "react-query";
+import { QueryClient, useMutation, useQuery, useQueryClient } from "react-query";
 import { useAxios } from "../config/axios";
 import {
   Box,
@@ -17,13 +17,19 @@ import {
   FormLabel,
   CloseButton,
   Spacer,
-  useToast
+  useToast,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverArrow,
+  PopoverCloseButton,
+  useDisclosure
 } from "@chakra-ui/react";
 import KanbanCategory from "../components/kanban/KanbanCategory";
 
 function Project() {
   const toast = useToast();
-
+  const queryClient = useQueryClient();
   // const [project, setProject] = useState(null);
   // const [categories, setCategories] = useState(null);
   const [isOpen, setOpen] = useState(false);
@@ -31,6 +37,8 @@ function Project() {
   const [longDesc, setLongDesc] = useState("");
   const [bcName, setBcName] = useState(null);
   const [bcId, setBcId] = useState(null);
+  const [listName, setListName] = useState("");
+  const [isPopoverOpen, setPopOpen] = useState(false);
 
   const axiosInstance = useAxios();
   const { projectId } = useParams();
@@ -62,11 +70,29 @@ function Project() {
           description: "Created Successfully",
           status: "success"
         });
+        queryClient.invalidateQueries("getProjectData");
       },
       onError: err => {
         console.log(err);
       }
     }
+  );
+  const { mutate: createList } = useMutation("postList", () =>
+    axiosInstance(
+      { method: "post", url: `/project/newBugCategory`, data: { listName, projectId } },
+      {
+        onSuccess: () => {
+          toast({
+            description: "Created Successfully",
+            status: "success"
+          });
+          queryClient.invalidateQueries("getProjectData");
+        },
+        onError: err => {
+          console.log(err);
+        }
+      }
+    )
   );
 
   // useEffect(()=>{
@@ -153,16 +179,45 @@ function Project() {
               {project.name}
             </Text>
             <Spacer></Spacer>
+            <Popover
+              isOpen={isPopoverOpen}
+              onOpen={() => {
+                setPopOpen(true);
+              }}
+              onClose={() => {
+                setPopOpen(false);
+              }}
+              closeOnBlur={true}
+            >
+              <PopoverTrigger>
+                <Button>+ Add List</Button>
+              </PopoverTrigger>
+              <PopoverContent padding={"4"}>
+                <PopoverArrow />
+                <PopoverCloseButton />
+                <FormLabel>Enter list name</FormLabel>
+                <Input
+                  type={"text"}
+                  value={listName}
+                  onChange={e => {
+                    setListName(e.target.value);
+                  }}
+                ></Input>
+                <Button
+                  colorScheme={"green"}
+                  mt={"4"}
+                  onClick={() => {
+                    listName != "" && createList();
+                  }}
+                >
+                  Add
+                </Button>
+              </PopoverContent>
+            </Popover>
             <Button>Members</Button>
           </HStack>
           <Box width={"100%"}>
             <HStack overflowX={"auto"} spacing={"24px"} pb={"15px"}>
-              {categories.map(item => (
-                <KanbanCategory openModal={openModal} key={item.id} data={item} />
-              ))}
-              {categories.map(item => (
-                <KanbanCategory openModal={openModal} key={item.id} data={item} />
-              ))}
               {categories.map(item => (
                 <KanbanCategory openModal={openModal} key={item.id} data={item} />
               ))}

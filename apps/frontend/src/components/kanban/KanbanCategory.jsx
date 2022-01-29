@@ -32,12 +32,6 @@ function KanbanCategory({ openModal, data }) {
           {data.Bug.map(item => (
             <KanbanItem key={item.id} data={item} />
           ))}
-          {data.Bug.map(item => (
-            <KanbanItem key={item.id} data={item} />
-          ))}
-          {data.Bug.map(item => (
-            <KanbanItem key={item.id} data={item} />
-          ))}
         </Box>
       </Box>
     </div>
