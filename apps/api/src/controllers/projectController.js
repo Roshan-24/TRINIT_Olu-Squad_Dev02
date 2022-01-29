@@ -6,6 +6,7 @@ export const createNewProject = async (req, res) => {
       data: {
         name: req.projectName,
         admins: [req.user.id],
+        members: [req.user.id],
         organizationId: req.query.orgId
       }
     });

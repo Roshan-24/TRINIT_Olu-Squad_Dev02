@@ -5,7 +5,8 @@ export const createNewOrg = async (req, res) => {
     const organization = await prisma.organization.create({
       data: {
         name: req.orgName,
-        owners: [req.user.id]
+        owners: [req.user.id],
+        members: [req.user.id]
       }
     });
     res.status(201).json({ organization });
