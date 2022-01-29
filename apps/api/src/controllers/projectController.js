@@ -23,6 +23,16 @@ export const createNewProject = async (req, res) => {
         }
       }
     });
+    const bugCategory = await prisma.bugCategory.create({
+      data: {
+        name: 'PENDING',
+        project: {
+          connect: {
+            id: parseInt(project.id)
+          }
+        }
+      }
+    });
     return res.status(201).json({ project });
   } catch (err) {
     console.log(err);

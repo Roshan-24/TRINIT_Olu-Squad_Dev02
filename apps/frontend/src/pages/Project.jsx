@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useAxios } from "../config/axios";
@@ -11,6 +11,9 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
   Input,
   VStack,
   Textarea,
@@ -22,9 +25,12 @@ import {
   PopoverTrigger,
   PopoverContent,
   PopoverArrow,
-  PopoverCloseButton
+  PopoverCloseButton,
+  Heading,
+  Divider
 } from "@chakra-ui/react";
 import KanbanCategory from "../components/kanban/KanbanCategory";
+import KanbanItem2 from "../components/kanban/KanbanItem2";
 
 function Project() {
   const toast = useToast();
@@ -34,10 +40,14 @@ function Project() {
   const [isOpen, setOpen] = useState(false);
   const [shortDesc, setShortDesc] = useState("");
   const [longDesc, setLongDesc] = useState("");
+  const [shortDesc2, setShortDesc2] = useState("");
+  const [longDesc2, setLongDesc2] = useState("");
   const [bcName, setBcName] = useState(null);
   const [bcId, setBcId] = useState(null);
   const [listName, setListName] = useState("");
   const [isPopoverOpen, setPopOpen] = useState(false);
+  const [isOpenModal, setOpenModal] = useState(false);
+  const [isRaiseOpen, setRaiseOpen] = useState(false);
 
   const axiosInstance = useAxios();
   const { projectId } = useParams();
@@ -76,22 +86,47 @@ function Project() {
       }
     }
   );
-  const { mutate: createList } = useMutation("postList", () =>
-    axiosInstance(
-      { method: "post", url: `/project/newBugCategory`, data: { listName, projectId } },
-      {
-        onSuccess: () => {
-          toast({
-            description: "Created Successfully",
-            status: "success"
-          });
-          queryClient.invalidateQueries("getProjectData");
-        },
-        onError: err => {
-          console.log(err);
-        }
+  const { mutate: createList } = useMutation(
+    "postList",
+    () =>
+      axiosInstance({
+        method: "post",
+        url: `/project/newBugCategory`,
+        data: { listName, projectId }
+      }),
+    {
+      onSuccess: () => {
+        toast({
+          description: "Created Successfully",
+          status: "success"
+        });
+        queryClient.invalidateQueries("getProjectData");
+      },
+      onError: err => {
+        console.log(err);
       }
-    )
+    }
+  );
+  const { mutate: createBugRequest } = useMutation(
+    "postBugRequest",
+    () =>
+      axiosInstance({
+        method: "post",
+        url: `/bug/new`,
+        data: { bugName: shortDesc2, bugCategoryId: pendingId, description: longDesc2 }
+      }),
+    {
+      onSuccess: () => {
+        toast({
+          description: "Raised Successfully",
+          status: "success"
+        });
+        queryClient.invalidateQueries("getProjectData");
+      },
+      onError: err => {
+        console.log(err);
+      }
+    }
   );
 
   // useEffect(()=>{
@@ -104,7 +139,15 @@ function Project() {
   console.log(projectData);
   const project = projectData?.data?.data;
   const categories = projectData?.data?.data?.bugCategories;
-
+  let pendingId,
+    pendingBugs = [];
+  categories &&
+    categories.map(item => {
+      if (item.name == "PENDING") {
+        pendingId = item.id;
+        pendingBugs = item.Bug;
+      }
+    });
   const openModal = (bugCategoryName, bugCategoryId) => {
     setBcName(bugCategoryName);
     setBcId(bugCategoryId);
@@ -178,6 +221,96 @@ function Project() {
               {project.name}
             </Text>
             <Spacer></Spacer>
+            <Button
+              onClick={() => {
+                setRaiseOpen(true);
+              }}
+            >
+              Raise a Bug
+            </Button>
+            <Button
+              onClick={() => {
+                setOpenModal(true);
+              }}
+            >
+              Bug Requests
+            </Button>
+            <Modal
+              motionPreset="slideInRight"
+              onClose={() => {
+                setOpenModal(false);
+              }}
+              isOpen={isOpenModal}
+            >
+              <ModalOverlay />
+              <ModalContent pb={5} w={"100%"}>
+                <ModalHeader>
+                  <Heading textAlign={"center"}>Bug Requests</Heading>
+                </ModalHeader>
+                <Divider />
+                <ModalCloseButton />
+                <ModalBody>
+                  <VStack>
+                    {pendingBugs &&
+                      pendingBugs.map(item => (
+                        <Link to={"/bugs/" + item.id} style={{ width: "100%" }}>
+                          <KanbanItem2 data={{ name: item.name }} />
+                        </Link>
+                      ))}
+                  </VStack>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
+            <Modal
+              motionPreset="slideInRight"
+              onClose={() => {
+                setRaiseOpen(false);
+              }}
+              isOpen={isRaiseOpen}
+            >
+              <ModalOverlay />
+              <ModalContent pb={5} w={"100%"}>
+                <ModalHeader>
+                  <Heading textAlign={"center"}>Raise a bug</Heading>
+                </ModalHeader>
+                <Divider />
+                <ModalCloseButton />
+                <ModalBody>
+                  <FormLabel textAlign={"left"} width={"100%"} fontWeight={"semibold"}>
+                    Bug category
+                  </FormLabel>
+                  <Input value={"PENDING"} disabled={true} type={"text"} />
+                  <FormLabel textAlign={"left"} width={"100%"} fontWeight={"semibold"} pt={"3"}>
+                    Short description
+                  </FormLabel>
+                  <Input
+                    value={shortDesc2}
+                    onChange={e => {
+                      setShortDesc2(e.currentTarget.value);
+                    }}
+                    type={"text"}
+                  />
+                  <FormLabel width={"100%"} fontWeight={"semibold"} textAlign={"left"} pt={"3"}>
+                    Description
+                  </FormLabel>
+                  <Textarea
+                    onChange={e => {
+                      setLongDesc2(e.currentTarget.value);
+                    }}
+                    value={longDesc2}
+                  />
+                  <Button
+                    onClick={() => {
+                      setRaiseOpen(false);
+                      shortDesc2 !== "" && longDesc2 !== "" && createBugRequest();
+                    }}
+                    mt={"3"}
+                  >
+                    Request
+                  </Button>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
             <Popover
               isOpen={isPopoverOpen}
               onOpen={() => {
@@ -217,9 +350,12 @@ function Project() {
           </HStack>
           <Box width={"100%"}>
             <HStack overflowX={"auto"} spacing={"24px"} pb={"15px"}>
-              {categories.map(item => (
-                <KanbanCategory openModal={openModal} key={item.id} data={item} />
-              ))}
+              {categories.map(
+                item =>
+                  item.name != "PENDING" && (
+                    <KanbanCategory openModal={openModal} key={item.id} data={item} />
+                  )
+              )}
             </HStack>
           </Box>
         </Box>
