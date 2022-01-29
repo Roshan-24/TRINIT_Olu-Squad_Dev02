@@ -5,6 +5,7 @@ import Home from "../pages/Home";
 import Project from "../pages/Project";
 import Organization from "../pages/Organization";
 import OrganizationDashboard from "../pages/OrganizationDashboard";
+import Bug from "../pages/Bug";
 
 const Router = () => {
   return (
@@ -21,6 +22,7 @@ const Router = () => {
         }
       />
       <Route path="/organizations/:orgId" element={<OrganizationDashboard />} />
+      <Route path="/bug/:bugId" element={<Bug />} />
     </Routes>
   );
 };
