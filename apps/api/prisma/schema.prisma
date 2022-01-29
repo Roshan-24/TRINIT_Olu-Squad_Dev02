@@ -1,11 +1,102 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
+}
+
+generator docs {
+  provider = "node ../../node_modules/prisma-docs-generator"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int           @id @default(autoincrement())
+  email              String        @unique
+  password           String
+  firstName          String
+  lastName           String
+  organizationsOwned Orgnization[]
+  projectsOwned      Project[]     @relation("Project_adminToUser")
+  projectMembers     Project[]     @relation("Project_memberToUser")
+  bugsAssigned       Bug[]         @relation("Bug_assignedUsers")
+  postsCreated       ThreadPost[]
+  Bug                Bug[]
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+}
+
+model Orgnization {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  owners    User[]
+  projects  Project[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Project {
+  id            Int         @id @default(autoincrement())
+  name          String
+  organization  Orgnization @relation(fields: [orgnizationId], references: [id])
+  orgnizationId Int
+  admins        User[]      @relation("Project_adminToUser")
+  members       User[]      @relation("Project_memberToUser")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([orgnizationId, name])
+}
+
+enum BugStatus {
+  PENDING
+  APPROVED
+  ASSIGNED
+  RESOLVED
+}
+
+model BugCategory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  Bug       Bug[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Bug {
+  id             Int         @id @default(autoincrement())
+  name           String
+  description    String      @db.Text
+  bugStatus      BugStatus
+  assignedUsers  User[]      @relation("Bug_assignedUsers")
+  raisedBy       User        @relation(fields: [raisedByUserId], references: [id])
+  bugPriority    Int
+  bugCategory    BugCategory @relation(fields: [bugCategoryId], references: [id])
+  deadline       DateTime
+  thread         Thread?
+  bugCategoryId  Int
+  raisedByUserId Int
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model Thread {
+  id        Int          @id @default(autoincrement())
+  bug       Bug          @relation(fields: [bugId], references: [id])
+  bugId     Int          @unique
+  Post      ThreadPost[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model ThreadPost {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.Text
+  user      User     @relation(fields: [userId], references: [id])
+  thread    Thread   @relation(fields: [threadId], references: [id])
+  threadId  Int
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

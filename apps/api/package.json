@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon -r dotenv/config --es-module-specifier-resolution=node src/server.js",
     "start": "node --es-module-specifier-resolution=node src/server.js",
-    "start:docs": "prisma-docs-generator server",
+    "start:docs": "prisma-docs-generator serve",
     "fix:docs": "crlf --set=LF node_modules/.bin/prisma-docs-generator",
     "format:js": "prettier --write \"**/*.{js,json,*rc}\"",
     "format:prisma": "prisma format",
@@ -15,6 +15,7 @@
     "prepare": "yarn fix:docs"
   },
   "dependencies": {
+    "@prisma/client": "^3.8.1",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "express": "^4.17.2",
