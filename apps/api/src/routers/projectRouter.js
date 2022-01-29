@@ -3,7 +3,8 @@ import {
   getProjectById,
   createNewProject,
   listOrgProjects,
-  createNewList
+  createNewList,
+  searchProjects
 } from '../controllers/projectController';
 import { jwtAuthGuard } from '../controllers/authController';
 
@@ -18,5 +19,7 @@ projectRouter.get('/getByOrgId/:orgId', jwtAuthGuard, listOrgProjects);
 projectRouter.post('/newBugCategory', jwtAuthGuard, createNewList);
 
 projectRouter.get('/', jwtAuthGuard, listOrgProjects);
+
+projectRouter.post('/search', searchProjects);
 
 export default projectRouter;

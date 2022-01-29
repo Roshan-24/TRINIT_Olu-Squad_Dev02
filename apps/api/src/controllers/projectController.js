@@ -85,3 +85,18 @@ export const createNewList = async (req, res) => {
     res.status(500).json({ message: 'Something went wrong!' });
   }
 };
+
+export const searchProjects = async (req, res) => {
+  try {
+    const projects = await prisma.project.findMany({
+      where: {
+        name: {
+          contains: req.query.q
+        }
+      }
+    });
+    return res.status(200).json({ projects });
+  } catch (err) {
+    return res.status(500).json({ message: 'Something went wrong!' });
+  }
+};

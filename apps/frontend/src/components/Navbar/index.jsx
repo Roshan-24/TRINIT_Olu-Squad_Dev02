@@ -28,6 +28,7 @@ import { navbarHeight } from "../../config/constants";
 import { userContext } from "../../contexts/UserContext";
 import HamburgerMenuButton from "./../MenuButton";
 import navItems from "./navbarItems";
+import Search from "./search";
 
 const MotionVStack = motion(VStack);
 
@@ -75,6 +76,9 @@ const Navbar = () => {
         <Spacer />
         {isLargerThanSm ? (
           <>
+            <Box pos={"relative"}>
+              <Search />
+            </Box>
             <IconButton
               onClick={toggleColorMode}
               icon={colorMode === "dark" ? <FiSun /> : <FiMoon />}

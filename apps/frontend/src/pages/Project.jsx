@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { QueryClient, useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useAxios } from "../config/axios";
 import {
   Box,
@@ -22,8 +22,7 @@ import {
   PopoverTrigger,
   PopoverContent,
   PopoverArrow,
-  PopoverCloseButton,
-  useDisclosure
+  PopoverCloseButton
 } from "@chakra-ui/react";
 import KanbanCategory from "../components/kanban/KanbanCategory";
 
