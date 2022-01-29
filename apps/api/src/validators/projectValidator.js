@@ -6,7 +6,7 @@ export const projectNameValidator = [
   check('name').custom(async (name, { req }) => {
     const project = await prisma.project.findUnique({
       where: {
-        organizationId_name: { organizationId: req.organization.id, name }
+        organizationId_name: { organizationId: req.body.organizationId, name }
       }
     });
     if (project)

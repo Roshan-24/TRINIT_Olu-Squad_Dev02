@@ -81,9 +81,9 @@ model Bug {
   bugStatus      BugStatus
   assignedUsers  User[]      @relation("Bug_assignedUsers")
   raisedBy       User        @relation(fields: [raisedByUserId], references: [id])
-  bugPriority    Int
+  bugPriority    Int?
   bugCategory    BugCategory @relation(fields: [bugCategoryId], references: [id])
-  deadline       DateTime
+  deadline       DateTime?
   thread         Thread?
   bugCategoryId  Int
   raisedByUserId Int

@@ -31,13 +31,17 @@ export const listOrgProjects = async (req, res) => {
 
 export const getProjectById = async (req, res) => {
   try {
-    console.log(req.params);
     const curProject = await prisma.project.findUnique({
       where: {
         id: Number(req.params['id'])
       },
       include: {
-        organization: true
+        organization: true,
+        bugCategories: {
+          include: {
+            Bug: true
+          }
+        }
       }
     });
     if (curProject) res.json({ data: curProject });
