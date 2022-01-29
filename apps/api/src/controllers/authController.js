@@ -12,7 +12,9 @@ export const localAuthGuard = passport.authenticate(LocalStrategy, {
   session: false
 });
 
-export const jwtAuthGuard = passport.authenticate(JwtStrategy);
+export const jwtAuthGuard = passport.authenticate(JwtStrategy, {
+  session: false
+});
 
 export const verifyPassword = async (user, password) =>
   await bcrypt.compare(password, user.password);
