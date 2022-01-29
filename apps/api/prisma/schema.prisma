@@ -38,15 +38,16 @@ model Organization {
 }
 
 model Project {
-  id             Int          @id @default(autoincrement())
+  id             Int           @id @default(autoincrement())
   name           String
   description    String
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization  @relation(fields: [organizationId], references: [id])
   organizationId Int
-  admins         User[]       @relation("Project_adminToUser")
-  members        User[]       @relation("Project_memberToUser")
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  admins         User[]        @relation("Project_adminToUser")
+  members        User[]        @relation("Project_memberToUser")
+  bugCategories  BugCategory[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   @@unique([organizationId, name])
 }
@@ -62,9 +63,13 @@ enum BugStatus {
 model BugCategory {
   id        Int      @id @default(autoincrement())
   name      String
+  project   Project  @relation(fields: [projectId], references: [id])
   Bug       Bug[]
+  projectId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([name, projectId])
 }
 
 model Bug {
