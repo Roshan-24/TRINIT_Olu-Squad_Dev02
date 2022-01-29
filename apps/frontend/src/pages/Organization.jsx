@@ -31,7 +31,7 @@ const Organization = () => {
 
   const axiosInstance = useAxios();
 
-  const { data, isLoading } = useQuery("userOrgs", () => axiosInstance({ url: "/orgs" }));
+  const { data, isLoading } = useQuery("userOrgs", () => axiosInstance({ url: "/org" }));
 
   const navigate = useNavigate();
 

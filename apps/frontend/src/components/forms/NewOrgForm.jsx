@@ -29,7 +29,7 @@ const NewOrgForm = () => {
   const queryClient = useQueryClient();
   const { mutate, isLoading, error } = useMutation(
     "createOrg",
-    data => axiosInstance({ method: "post", url: "/orgs/new", data }),
+    data => axiosInstance({ method: "post", url: "/org/new", data }),
     {
       onSuccess: data => {
         toast({

@@ -28,7 +28,7 @@ const NewProjectForm = ({ orgId }) => {
 
   const { mutate, isLoading, error } = useMutation(
     "createProject",
-    data => axiosInstance({ method: "post", url: "/projects/new", data }),
+    data => axiosInstance({ method: "post", url: "/project/new", data }),
     {
       onSuccess: data => {
         toast({

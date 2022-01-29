@@ -45,8 +45,8 @@ const OrganizationDashboard = () => {
   useEffect(async () => {
     setOrgLoading(true);
     setProjectsLoading(true);
-    setOrgData(await axiosInstance.get(`/orgs/${orgId}`));
-    setProjectsData(await axiosInstance.get(`/projects/getByOrgId?orgId=${orgId}`));
+    setOrgData(await axiosInstance.get(`/org/${orgId}`));
+    setProjectsData(await axiosInstance.get(`/project/getByOrgId?orgId=${orgId}`));
     setProjectsLoading(false);
     setOrgLoading(false);
   }, []);
