@@ -28,3 +28,22 @@ export const listOrgProjects = async (req, res) => {
     res.status(500).json({ message: 'Something went wrong!' });
   }
 };
+
+export const getProjectById = async (req, res) => {
+  try {
+    console.log(req.params);
+    const curProject = await prisma.project.findUnique({
+      where: {
+        id: Number(req.params['id'])
+      },
+      include: {
+        organization: true
+      }
+    });
+    if (curProject) res.json({ data: curProject });
+    else return;
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({ message: 'Project not found' });
+  }
+};
