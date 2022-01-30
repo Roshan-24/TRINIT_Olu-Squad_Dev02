@@ -87,7 +87,12 @@ function Project() {
       axiosInstance({
         method: "post",
         url: `/bug/new`,
-        data: { bugName: shortDesc, bugCategoryId: bcId, description: longDesc }
+        data: {
+          bugName: shortDesc,
+          bugCategoryId: bcId,
+          description: longDesc,
+          projectId: project?.id
+        }
       }),
     {
       onSuccess: () => {
@@ -129,7 +134,12 @@ function Project() {
       axiosInstance({
         method: "post",
         url: `/bug/new`,
-        data: { bugName: shortDesc2, bugCategoryId: pendingId, description: longDesc2 }
+        data: {
+          bugName: shortDesc2,
+          bugCategoryId: pendingId,
+          description: longDesc2,
+          projectId: project?.id
+        }
       }),
     {
       onSuccess: () => {
@@ -164,10 +174,19 @@ function Project() {
         pendingBugs = item.Bug;
       }
     });
-  var isProjectAdmin = false;
-  project?.admins?.forEach(admin => {
-    if (admin.id == user.id) isProjectAdmin = true;
-  });
+
+  if (user) {
+    var isOrgAdmin = false;
+    user?.organizationsOwned?.forEach(org => {
+      if (org.id == project?.organization?.id) isOrgAdmin = true;
+    });
+    var isProjectAdmin = false;
+    user?.projectsOwned?.forEach(org => {
+      if (org.id == project?.organization?.id) isOrgAdmin = true;
+    });
+    isProjectAdmin = isProjectAdmin || isOrgAdmin;
+  }
+
   const openModal = (bugCategoryName, bugCategoryId) => {
     setBcName(bugCategoryName);
     setBcId(bugCategoryId);
@@ -288,7 +307,7 @@ function Project() {
                   <VStack>
                     {pendingBugs &&
                       pendingBugs.map(item => (
-                        <Link key={item.id} to={"/bugs/" + item.id} style={{ width: "100%" }}>
+                        <Link key={item.id} to={"/bug/" + item.id} style={{ width: "100%" }}>
                           <KanbanItem2 data={{ name: item.name }} />
                         </Link>
                       ))}
@@ -395,14 +414,17 @@ function Project() {
               spacing={"24px"}
               pb={"15px"}
             >
-              {categories.map(item => (
-                <KanbanCategory
-                  isProjectAdmin={isProjectAdmin}
-                  openModal={openModal}
-                  key={item.id}
-                  data={item}
-                />
-              ))}
+              {categories.map(item => {
+                if (item.name != "PENDING")
+                  return (
+                    <KanbanCategory
+                      isProjectAdmin={isProjectAdmin}
+                      openModal={openModal}
+                      key={item.id}
+                      data={item}
+                    />
+                  );
+              })}
             </Stack>
           </Box>
         </Box>

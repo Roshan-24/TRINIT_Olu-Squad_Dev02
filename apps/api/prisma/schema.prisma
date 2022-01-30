@@ -79,6 +79,7 @@ model Bug {
   id             Int         @id @default(autoincrement())
   name           String
   description    String      @db.Text
+  projectId      Int?
   bugStatus      BugStatus
   assignedUsers  User[]      @relation("Bug_assignedUsers")
   raisedBy       User        @relation(fields: [raisedByUserId], references: [id])

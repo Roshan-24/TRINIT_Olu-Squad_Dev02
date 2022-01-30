@@ -8,7 +8,15 @@ const options = {
 };
 
 const LocalStrategy = new Strategy(options, async (email, passwd, cb) => {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: {
+      organizationsOwned: true,
+      organizationMembers: true,
+      projectMembers: true,
+      projectsOwned: true
+    }
+  });
   if (!user || !(await verifyPassword(user, passwd))) return cb(null, false);
   const { password, ...result } = user;
   return cb(null, result);

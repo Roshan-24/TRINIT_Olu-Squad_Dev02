@@ -26,8 +26,9 @@ function KanbanCategory({ openModal, data, isProjectAdmin }) {
               onClick={() => {
                 openModal(data.name, data.id);
               }}
+              fontSize={"30px"}
             >
-              plus
+              +
             </Button>
           )}
         </HStack>

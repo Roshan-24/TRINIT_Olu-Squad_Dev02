@@ -9,7 +9,13 @@ const options = {
 
 const JwtStrategy = new Strategy(options, async (payload, cb) => {
   const user = await prisma.user.findUnique({
-    where: { email: payload.email }
+    where: { email: payload.email },
+    include: {
+      organizationMembers: true,
+      organizationsOwned: true,
+      projectMembers: true,
+      projectsOwned: true
+    }
   });
   if (!user) return cb(null, false);
   const { password, ...result } = user;
