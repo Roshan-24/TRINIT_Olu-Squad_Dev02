@@ -3,13 +3,14 @@ import { parseISO } from "date-fns";
 
 function ThreadPost({ data }) {
   const bgColor = useColorModeValue("#EDF2F7", "#171A25");
+  console.log(data?.user);
   return (
     <div>
       <HStack spacing="15px" mb={"15px"}>
         <Image
           width={"30px"}
           borderRadius={"10px"}
-          src={`https://gravatar.com/avatar/${data?.user?.email}?d=retro`}
+          src={`https://gravatar.com/avatar/${data?.user?.hashedEmail}?d=retro`}
         />
         <Text fontSize={"2.3vh"} fontWeight={"bold"}>
           {data?.user?.firstName}

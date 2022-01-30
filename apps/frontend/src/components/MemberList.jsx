@@ -50,7 +50,11 @@ const MemberList = ({ isUserAdmin, admins, members, promoteFn, kickFn, addMember
       {admins.map(admin => (
         <HStack key={admin.id} w={"full"}>
           <Box boxSize={10}>
-            <Image src={`http://gravatar.com/avatar/${admin.email}?d=retro`} alt="User Avatar" />
+            <Image
+              borderRadius={"10px"}
+              src={`http://gravatar.com/avatar/${admin.hashedEmail}?d=retro`}
+              alt="User Avatar"
+            />
           </Box>
           <Text pl={4} key={admin.id}>
             {admin.firstName + " " + admin.lastName}
@@ -63,7 +67,11 @@ const MemberList = ({ isUserAdmin, admins, members, promoteFn, kickFn, addMember
         .map(member => (
           <HStack key={member.id} w={"full"}>
             <Box boxSize={10}>
-              <Image src={`http://gravatar.com/avatar/${member.email}?d=retro`} alt="User Avatar" />
+              <Image
+                borderRadius={"10px"}
+                src={`http://gravatar.com/avatar/${member.hashedEmail}?d=retro`}
+                alt="User Avatar"
+              />
             </Box>
             <Text pl={4} key={member.id}>
               {member.firstName + " " + member.lastName}

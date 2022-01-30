@@ -65,7 +65,9 @@ export const getProjectById = async (req, res) => {
           include: {
             Bug: true
           }
-        }
+        },
+        admins: true,
+        members: true
       }
     });
     if (curProject) res.json({ data: curProject });

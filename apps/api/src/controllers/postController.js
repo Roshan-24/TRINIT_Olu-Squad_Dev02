@@ -6,23 +6,21 @@ export const createNewPost = async (req, res) => {
     console.log(req.body);
     const post = await prisma.threadPost.create({
       data: {
-        name: req.body.bugName,
-        raisedBy: {
+        content: req.body.content,
+        user: {
           connect: {
-            id: parseInt(req.user.id)
+            id: req.user.id
           }
         },
-        bugCategory: {
+        thread: {
           connect: {
-            id: parseInt(req.body.bugCategoryId)
+            id: req.body.threadId
           }
-        },
-        bugStatus: PrismaClient.BugStatus.PENDING,
-        description: req.body.description
+        }
       }
     });
 
-    res.status(201).json({ bug, thread });
+    res.status(201).json({ post });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Something went wrong!' });

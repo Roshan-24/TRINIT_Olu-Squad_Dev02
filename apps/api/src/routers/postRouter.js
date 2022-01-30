@@ -2,7 +2,7 @@ import express from 'express';
 import { createNewPost } from '../controllers/postController';
 import { jwtAuthGuard } from '../controllers/authController';
 
-const postRoouter = express.Router();
+const postRouter = express.Router();
 
 postRouter.post('/new', jwtAuthGuard, createNewPost);
 

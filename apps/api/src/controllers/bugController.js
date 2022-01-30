@@ -30,6 +30,34 @@ export const createNewBug = async (req, res) => {
         }
       }
     });
+    var isAdmin = false;
+    if (req.user) {
+      const curBugCategory = await prisma.bugCategory.findUnique({
+        where: {
+          id: bug.bugCategoryId
+        },
+        include: {
+          project: {
+            include: {
+              admins: true
+            }
+          }
+        }
+      });
+      curBugCategory.project.admins.forEach(admin => {
+        if (admin.id == req.user.id) isAdmin = true;
+      });
+      if (isAdmin) {
+        const curbug = await prisma.bug.update({
+          where: {
+            id: bug.id
+          },
+          data: {
+            bugStatus: 'APPROVED'
+          }
+        });
+      }
+    }
 
     res.status(201).json({ bug, thread });
   } catch (err) {
@@ -49,7 +77,9 @@ export const getBugById = async (req, res) => {
           include: {
             project: {
               include: {
-                organization: true
+                organization: true,
+                admins: true,
+                members: true
               }
             }
           }
@@ -57,9 +87,10 @@ export const getBugById = async (req, res) => {
         raisedBy: true
       }
     });
+    console.log(curBug);
     const curThread = await prisma.thread.findUnique({
       where: {
-        id: curBug.id
+        bugId: curBug.id
       },
       include: {
         Post: {
@@ -71,6 +102,20 @@ export const getBugById = async (req, res) => {
     });
     if (curBug && curThread) res.json({ bug: curBug, thread: curThread });
     else return;
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({ message: 'Project not found' });
+  }
+};
+
+export const approveBug = async (req, res) => {
+  try {
+    const curBug = await prisma.bug.update({
+      where: {
+        id: Number(req.params['id'])
+      },
+      data: { bugStatus: 'APPROVED' }
+    });
   } catch (err) {
     console.log(err);
     res.status(404).json({ message: 'Project not found' });

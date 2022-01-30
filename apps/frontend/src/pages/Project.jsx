@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -7,6 +7,7 @@ import {
   Box,
   Text,
   HStack,
+  Stack,
   Button,
   Modal,
   ModalOverlay,
@@ -31,6 +32,7 @@ import {
 } from "@chakra-ui/react";
 import KanbanCategory from "../components/kanban/KanbanCategory";
 import KanbanItem2 from "../components/kanban/KanbanItem2";
+import { userContext } from "../contexts/UserContext";
 
 function Project() {
   const toast = useToast();
@@ -49,6 +51,7 @@ function Project() {
   const [isOpenModal, setOpenModal] = useState(false);
   const [isRaiseOpen, setRaiseOpen] = useState(false);
 
+  const { user } = useContext(userContext);
   const axiosInstance = useAxios();
   const { projectId } = useParams();
   // console.log(projectId);
@@ -136,7 +139,7 @@ function Project() {
   const { data: projectData } = useQuery("getProjectData", () =>
     axiosInstance({ method: "get", url: `project/${projectId}` })
   );
-  console.log(projectData);
+  // console.log(projectData?.data?.data)
   const project = projectData?.data?.data;
   const categories = projectData?.data?.data?.bugCategories;
   let pendingId,
@@ -148,6 +151,10 @@ function Project() {
         pendingBugs = item.Bug;
       }
     });
+  var isProjectAdmin = false;
+  project?.admins?.forEach(admin => {
+    if (admin.id == user.id) isProjectAdmin = true;
+  });
   const openModal = (bugCategoryName, bugCategoryId) => {
     setBcName(bugCategoryName);
     setBcId(bugCategoryId);
@@ -211,9 +218,11 @@ function Project() {
       {project && categories ? (
         <Box mx={"5%"} pt={"100px"} className="headerTitle">
           <HStack spacing={"15px"} mb={"25px"}>
-            <Text fontSize={"3vh"} fontWeight={"bold"}>
-              {project.organization.name}
-            </Text>
+            <Link to={`/organizations/${project?.organization?.id}}`}>
+              <Text fontSize={"3vh"} fontWeight={"bold"}>
+                {project.organization.name}
+              </Text>
+            </Link>
             <Text fontSize={"3vh"} position={"relative"} top={"-5px"} fontWeight={"bold"}>
               {"→"}
             </Text>
@@ -311,52 +320,64 @@ function Project() {
                 </ModalBody>
               </ModalContent>
             </Modal>
-            <Popover
-              isOpen={isPopoverOpen}
-              onOpen={() => {
-                setPopOpen(true);
-              }}
-              onClose={() => {
-                setPopOpen(false);
-              }}
-              closeOnBlur={true}
-            >
-              <PopoverTrigger>
-                <Button>+ Add List</Button>
-              </PopoverTrigger>
-              <PopoverContent padding={"4"}>
-                <PopoverArrow />
-                <PopoverCloseButton />
-                <FormLabel>Enter list name</FormLabel>
-                <Input
-                  type={"text"}
-                  value={listName}
-                  onChange={e => {
-                    setListName(e.target.value);
-                  }}
-                ></Input>
-                <Button
-                  colorScheme={"green"}
-                  mt={"4"}
-                  onClick={() => {
-                    listName != "" && createList();
-                  }}
-                >
-                  Add
-                </Button>
-              </PopoverContent>
-            </Popover>
+          	{isProjectAdmin && (
+              <Popover
+                isOpen={isPopoverOpen}
+                onOpen={() => {
+                  setPopOpen(true);
+                }}
+                onClose={() => {
+                  setPopOpen(false);
+                }}
+                closeOnBlur={true}
+              >
+                <PopoverTrigger>
+                  <Button>+ Add List</Button>
+                </PopoverTrigger>
+                <PopoverContent padding={"4"}>
+                  <PopoverArrow />
+                  <PopoverCloseButton />
+                  <FormLabel>Enter list name</FormLabel>
+                  <Input
+                    type={"text"}
+                    value={listName}
+                    onChange={e => {
+                      setListName(e.target.value);
+                    }}
+                  ></Input>
+                  <Button
+                    colorScheme={"green"}
+                    mt={"4"}
+                    onClick={() => {
+                      if (listName != "") {
+                        createList();
+                        setListName("");
+                      }
+                    }}
+                  >
+                    Add
+                  </Button>
+                </PopoverContent>
+              </Popover>
+            )}
             <Button>Members</Button>
           </HStack>
           <Box width={"100%"}>
-            <HStack overflowX={"auto"} spacing={"24px"} pb={"15px"}>
-              {categories.map(
-                item =>
-                  item.name != "PENDING" && (
-                    <KanbanCategory openModal={openModal} key={item.id} data={item} />
-                  )
-              )}
-            </HStack>
+            <Stack
+              overflowX={"auto"}
+              direction={["column", "column", "row", "row"]}
+              spacing={"24px"}
+              pb={"15px"}
+            >
+              {categories.map(item => (
+                <KanbanCategory
+                  isProjectAdmin={isProjectAdmin}
+                  openModal={openModal}
+                  key={item.id}
+                  data={item}
+                />
+              ))}
+            </Stack>
           </Box>
         </Box>
       ) : (

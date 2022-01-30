@@ -1,21 +1,10 @@
 const navItems = [
   {
-    name: "Docs",
-    href: "/docs",
+    name: "Orgs",
+    href: "/organizations",
     mainNav: true,
     dropdown: true
-  },
-  {
-    name: "Team",
-    href: "/team",
-    mainNav: true,
-    dropdown: true
-  },
-  {
-    name: "Careers",
-    href: "/careers",
-    mainNav: true,
-    dropdown: true
+    // needAuth: true
   },
   {
     name: "Profile",

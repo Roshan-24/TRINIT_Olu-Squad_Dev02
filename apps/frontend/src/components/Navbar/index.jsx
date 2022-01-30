@@ -57,12 +57,14 @@ const Navbar = () => {
         borderColor={"gray.700"}
         zIndex={"10"}
       >
-        <Heading fontSize={"2xl"} fontWeight={"bold"}>
-          Tri-NIT Hacc
-        </Heading>
+        <Link to={"/"}>
+          <Heading fontSize={"2xl"} fontWeight={"bold"}>
+            Bug tracker
+          </Heading>
+        </Link>
         {isLargerThanSm && (
           <HStack spacing={0} pl={4}>
-            {navItems
+            {/* {navItems
               .filter(navItem => navItem.mainNav)
               .map((navItem, idx) => (
                 <Link to={navItem.href} key={idx}>
@@ -70,7 +72,12 @@ const Navbar = () => {
                     {navItem.name}
                   </Button>
                 </Link>
-              ))}
+              ))} */}
+            <Link to={"/organizations"}>
+              <Button fontWeight={"normal"} variant={"ghost"}>
+                Orgs
+              </Button>
+            </Link>
           </HStack>
         )}
         <Spacer />

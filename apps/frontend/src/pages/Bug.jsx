@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import Navbar from "../components/Navbar";
 import { useAxios } from "../config/axios";
 import { useParams, Link } from "react-router-dom";
@@ -12,20 +12,27 @@ import {
   Image,
   useColorModeValue
 } from "@chakra-ui/react";
-import { useQuery } from "react-query";
+import { useQuery, useMutation, useQueryClient } from "react-query";
 import ThreadPost from "../components/ThreadPost";
+import { HiOutlineFire, HiOutlineHand } from "react-icons/hi";
+import { FaHandshake } from "react-icons/fa";
+import { userContext } from "../contexts/UserContext";
 
 function Bug() {
   const [comment, setComment] = useState("");
+  const { user } = useContext(userContext);
+
   const bgColor = useColorModeValue("#EDF2F7", "#171A25");
   const borderColor = useColorModeValue("#ccc", "#171A25");
   const borderTopColor = useColorModeValue("#ccc", "#555");
   const axiosInstance = useAxios();
+  const queryClient = useQueryClient();
   const { bugId } = useParams();
+
   const { data: bugData } = useQuery("getBugData", () =>
     axiosInstance({ method: "get", url: `/bug/${bugId}` })
   );
-  console.log(bugData?.data?.thread);
+  // console.log(bugData?.data?.thread);
   const thread = bugData?.data?.thread;
   const posts = thread?.Post;
   const bug = bugData?.data?.bug;
@@ -34,30 +41,63 @@ function Bug() {
   const raisedBy = bug?.raisedBy;
   const organization = project?.organization;
 
-  // const { mutate: postComment } = useMutation(
-  //   "postComment",
-  //   () =>
-  //     axiosInstance({
-  //       method: "post",
-  //       url: `/post/new`,
-  //       data: { bugName: shortDesc, bugCategoryId: bcId, description: longDesc }
-  //     }),
-  //   {
-  //     onSuccess: () => {},
-  //     onError: err => {
-  //       console.log(err);
-  //     }
-  //   }
-  // );
+  var isProjectAdmin = false;
+  project?.admins?.forEach(admin => {
+    if (admin.id == user.id) isProjectAdmin = true;
+  });
 
-  const createComment = () => {};
+  const { mutate: postComment } = useMutation(
+    "postComment",
+    () =>
+      axiosInstance({
+        method: "post",
+        url: `/post/new`,
+        data: { content: comment, threadId: thread.id }
+      }),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("getBugData");
+      },
+      onError: err => {
+        console.log(err);
+      }
+    }
+  );
+
+  const statusIconRenderer = () => {
+    console.log(bug?.bugStatus);
+    switch (bug?.bugStatus) {
+      case "PENDING": {
+        return <HiOutlineHand fontSize={"25px"} />;
+      }
+      case "APPROVED": {
+        return <FaHandshake fontSize={"25px"} />;
+      }
+      case "ASSIGNED": {
+        return <HiOutlineFire fontSize={"25px"} />;
+      }
+      case "RESOLVED": {
+        return <HiOutlineFire fontSize={"25px"} />;
+      }
+      case "CLOSED": {
+        return <HiOutlineFire fontSize={"25px"} />;
+      }
+      default:
+        return <HiOutlineFire />;
+    }
+  };
+
+  const createComment = () => {
+    postComment();
+    setComment("");
+  };
 
   return (
     <div>
       <Navbar />
       <Box mx={"15%"} pt={"100px"} className="headerTitle">
         <HStack spacing={"10px"} mb={"25px"}>
-          <Link to={`/org/${organization?.id}}`}>
+          <Link to={`/organizations/${organization?.id}}`}>
             <Text fontSize={"3vh"} fontWeight={"bold"}>
               {organization?.name}
             </Text>
@@ -73,14 +113,21 @@ function Bug() {
           <Text fontSize={"3vh"} position={"relative"} top={"-5px"} fontWeight={"bold"}>
             {"→"}
           </Text>
-          <Text fontSize={"3vh"} fontWeight={"bold"}>
+          <Text fontSize={"3vh"} pr={"15px"} fontWeight={"bold"}>
             {bug?.name}
           </Text>
+          {statusIconRenderer()}
+
           <Spacer></Spacer>
+
+          {isProjectAdmin && bug?.bugStatus == "PENDING" && <Button>Approve</Button>}
+          <Text fontSize={"2.5vh"} pr={"10px"}>
+            {"Raised by"}
+          </Text>
           <Image
             width={"40px"}
             borderRadius={"10px"}
-            src={`https://gravatar.com/avatar/${raisedBy?.email}?d=retro`}
+            src={`https://gravatar.com/avatar/${raisedBy?.hashedEmail}?d=retro`}
           />
           <Text fontSize={"2.5vh"} fontWeight={"bold"}>
             {raisedBy?.firstName}
@@ -114,6 +161,7 @@ function Bug() {
             disabled={comment == ""}
             onClick={createComment}
             mt="15px"
+            mb="50px"
             float={"right"}
           >
             Comment

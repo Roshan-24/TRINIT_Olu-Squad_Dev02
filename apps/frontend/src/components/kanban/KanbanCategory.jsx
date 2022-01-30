@@ -2,16 +2,17 @@ import { Box, Text, Spacer, HStack, Button, useColorModeValue } from "@chakra-ui
 import KanbanItem from "./KanbanItem";
 // import {Link} from 'react-router-dom'
 
-function KanbanCategory({ openModal, data }) {
+function KanbanCategory({ openModal, data, isProjectAdmin }) {
   const bgColor = useColorModeValue("#EDF2F7", "#171A25");
 
   return (
     <div>
       <Box
-        height={"75vh"}
+        height={["auto"]}
         borderRadius={10}
         p={"25px"}
         paddingRight={"15px"}
+        maxWidth={"100%"}
         width={"375px"}
         backgroundColor={bgColor}
       >
@@ -20,13 +21,15 @@ function KanbanCategory({ openModal, data }) {
             {data.name}
           </Text>
           <Spacer />
-          <Button
-            onClick={() => {
-              openModal(data.name, data.id);
-            }}
-          >
-            plus
-          </Button>
+          {isProjectAdmin && (
+            <Button
+              onClick={() => {
+                openModal(data.name, data.id);
+              }}
+            >
+              plus
+            </Button>
+          )}
         </HStack>
         <Box overflowY={"auto"} height={"93.5%"} mt={"10px"} paddingRight={"10px"}>
           {data.Bug.map(item => (
