@@ -3,7 +3,6 @@ import { parseISO } from "date-fns";
 
 function ThreadPost({ data }) {
   const bgColor = useColorModeValue("#EDF2F7", "#171A25");
-  console.log(data?.user);
   return (
     <div>
       <HStack spacing="15px" mb={"15px"}>

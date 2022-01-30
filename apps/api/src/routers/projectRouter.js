@@ -4,7 +4,10 @@ import {
   createNewProject,
   listOrgProjects,
   createNewList,
-  searchProjects
+  searchProjects,
+  makeProjectAdmin,
+  addUserToProject,
+  removeFromProject
 } from '../controllers/projectController';
 import { jwtAuthGuard } from '../controllers/authController';
 
@@ -21,5 +24,11 @@ projectRouter.post('/newBugCategory', jwtAuthGuard, createNewList);
 projectRouter.get('/', jwtAuthGuard, listOrgProjects);
 
 projectRouter.post('/search', searchProjects);
+
+projectRouter.post('/:projectId/makeOwner', jwtAuthGuard, makeProjectAdmin);
+
+projectRouter.post('/:projectId/add', jwtAuthGuard, addUserToProject);
+
+projectRouter.post('/:projectId/remove', jwtAuthGuard, removeFromProject);
 
 export default projectRouter;

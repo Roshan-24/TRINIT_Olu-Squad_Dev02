@@ -112,3 +112,57 @@ export const searchProjects = async (req, res) => {
     return res.status(500).json({ message: 'Something went wrong!' });
   }
 };
+
+export const addUserToProject = async (req, res) => {
+  try {
+    await prisma.project.update({
+      where: { id: parseInt(req.params.orgId) },
+      data: {
+        members: {
+          connect: {
+            email: req.body.email
+          }
+        }
+      }
+    });
+    return res.status(200).json({ message: 'User added to project' });
+  } catch (err) {
+    return res.status(500).json({ message: 'Something went wrong!' });
+  }
+};
+
+export const makeProjectAdmin = async (req, res) => {
+  try {
+    await prisma.project.update({
+      where: { id: parseInt(req.params.orgId) },
+      data: {
+        admins: {
+          connect: {
+            id: req.body.userId
+          }
+        }
+      }
+    });
+    return res.status(200).json({ message: 'User added to project' });
+  } catch (err) {
+    return res.status(500).json({ message: 'Something went wrong!' });
+  }
+};
+
+export const removeFromProject = async (req, res) => {
+  try {
+    await prisma.project.update({
+      where: { id: parseInt(req.params.orgId) },
+      data: {
+        members: {
+          disconnect: {
+            id: req.body.userId
+          }
+        }
+      }
+    });
+    return res.status(200).json({ message: 'User removed from project' });
+  } catch (err) {
+    return res.status(500).json({ message: 'Something went wrong!' });
+  }
+};

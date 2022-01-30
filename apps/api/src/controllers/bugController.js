@@ -79,7 +79,8 @@ export const getBugById = async (req, res) => {
               include: {
                 organization: true,
                 admins: true,
-                members: true
+                members: true,
+                bugCategories: true
               }
             }
           }
@@ -87,7 +88,6 @@ export const getBugById = async (req, res) => {
         raisedBy: true
       }
     });
-    console.log(curBug);
     const curThread = await prisma.thread.findUnique({
       where: {
         bugId: curBug.id
@@ -119,5 +119,25 @@ export const approveBug = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(404).json({ message: 'Project not found' });
+  }
+};
+
+export const editBug = async (req, res) => {
+  try {
+    const curBug = await prisma.bug.update({
+      where: {
+        id: Number(req.params['id'])
+      },
+      data: {
+        name: req.body.name,
+        description: req.body.description,
+        bugPriority: Number(req.body.priority),
+        bugCategoryId: Number(req.body.bugCategoryId)
+      }
+    });
+    res.status(200).json({ bug: curBug });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Project not found' });
   }
 };

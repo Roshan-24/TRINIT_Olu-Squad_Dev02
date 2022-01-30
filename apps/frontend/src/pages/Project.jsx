@@ -28,11 +28,18 @@ import {
   PopoverArrow,
   PopoverCloseButton,
   Heading,
-  Divider
+  Divider,
+  useDisclosure,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  DrawerBody
 } from "@chakra-ui/react";
 import KanbanCategory from "../components/kanban/KanbanCategory";
 import KanbanItem2 from "../components/kanban/KanbanItem2";
 import { userContext } from "../contexts/UserContext";
+import MemberList from "../components/MemberList";
 
 function Project() {
   const toast = useToast();
@@ -50,6 +57,12 @@ function Project() {
   const [isPopoverOpen, setPopOpen] = useState(false);
   const [isOpenModal, setOpenModal] = useState(false);
   const [isRaiseOpen, setRaiseOpen] = useState(false);
+
+  const {
+    isOpen: isMembersOpen,
+    onToggle: onMembersToggle,
+    onClose: onMembersClose
+  } = useDisclosure();
 
   const { user } = useContext(userContext);
   const axiosInstance = useAxios();
@@ -164,6 +177,19 @@ function Project() {
 
   const closeModal = () => {
     setOpen(false);
+  };
+
+  const addToProject = async email => {
+    // await axiosInstance.post(`/project/${projectId}/add`, { email });
+    console.log(email);
+  };
+
+  const removeFromProject = async userId => {
+    console.log(userId);
+  };
+
+  const makeProjectAdmin = async userId => {
+    console.log(userId);
   };
 
   return (
@@ -360,7 +386,7 @@ function Project() {
                 </PopoverContent>
               </Popover>
             )}
-            <Button>Members</Button>
+            <Button onClick={onMembersToggle}>Members</Button>
           </HStack>
           <Box width={"100%"}>
             <Stack
@@ -383,6 +409,22 @@ function Project() {
       ) : (
         <Box></Box>
       )}
+      <Drawer isOpen={isMembersOpen} placement="right" onClose={onMembersClose}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerBody>
+            <MemberList
+              isUserAdmin={project?.admins.some(owner => owner.id === user.id)}
+              promoteFn={makeProjectAdmin}
+              kickFn={removeFromProject}
+              addMembersFn={addToProject}
+              admins={project?.admins ?? []}
+              members={project?.members ?? []}
+            />
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }

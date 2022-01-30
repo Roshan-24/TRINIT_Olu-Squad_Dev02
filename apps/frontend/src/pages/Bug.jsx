@@ -10,17 +10,32 @@ import {
   Textarea,
   Spacer,
   Image,
-  useColorModeValue
+  useColorModeValue,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalHeader,
+  ModalContent,
+  ModalOverlay,
+  useDisclosure,
+  Container
 } from "@chakra-ui/react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import ThreadPost from "../components/ThreadPost";
 import { HiOutlineFire, HiOutlineHand } from "react-icons/hi";
 import { FaHandshake } from "react-icons/fa";
 import { userContext } from "../contexts/UserContext";
+import EditBugForm from "../components/forms/EditBugForm";
 
 function Bug() {
   const [comment, setComment] = useState("");
   const { user } = useContext(userContext);
+
+  const {
+    isOpen: isEditBugOpen,
+    onClose: onEditBugClose,
+    onToggle: onEditBugToggle
+  } = useDisclosure();
 
   const bgColor = useColorModeValue("#EDF2F7", "#171A25");
   const borderColor = useColorModeValue("#ccc", "#171A25");
@@ -32,7 +47,7 @@ function Bug() {
   const { data: bugData } = useQuery("getBugData", () =>
     axiosInstance({ method: "get", url: `/bug/${bugId}` })
   );
-  // console.log(bugData?.data?.thread);
+
   const thread = bugData?.data?.thread;
   const posts = thread?.Post;
   const bug = bugData?.data?.bug;
@@ -41,10 +56,7 @@ function Bug() {
   const raisedBy = bug?.raisedBy;
   const organization = project?.organization;
 
-  var isProjectAdmin = false;
-  project?.admins?.forEach(admin => {
-    if (admin.id == user.id) isProjectAdmin = true;
-  });
+  const isProjectAdmin = project?.admins?.some(admin => admin.id === user.id);
 
   const { mutate: postComment } = useMutation(
     "postComment",
@@ -65,7 +77,6 @@ function Bug() {
   );
 
   const statusIconRenderer = () => {
-    console.log(bug?.bugStatus);
     switch (bug?.bugStatus) {
       case "PENDING": {
         return <HiOutlineHand fontSize={"25px"} />;
@@ -95,7 +106,8 @@ function Bug() {
   return (
     <div>
       <Navbar />
-      <Box mx={"15%"} pt={"100px"} className="headerTitle">
+      <Container maxW={"container.lg"} className="headerTitle">
+        <Box h={"100px"} w={"full"} />
         <HStack spacing={"10px"} mb={"25px"}>
           <Link to={`/organizations/${organization?.id}}`}>
             <Text fontSize={"3vh"} fontWeight={"bold"}>
@@ -120,7 +132,12 @@ function Bug() {
 
           <Spacer></Spacer>
 
-          {isProjectAdmin && bug?.bugStatus == "PENDING" && <Button>Approve</Button>}
+          {isProjectAdmin && (
+            <>
+              <Button onClick={onEditBugToggle}>Edit</Button>
+              {bug?.bugStatus == "PENDING" && <Button>Approve</Button>}
+            </>
+          )}
           <Text fontSize={"2.5vh"} pr={"10px"}>
             {"Raised by"}
           </Text>
@@ -132,8 +149,6 @@ function Bug() {
           <Text fontSize={"2.5vh"} fontWeight={"bold"}>
             {raisedBy?.firstName}
           </Text>
-
-          {/* <Button>Members</Button> */}
         </HStack>
         <Text fontSize={"2.5vh"} mb={"10px"}>
           Description
@@ -167,7 +182,24 @@ function Bug() {
             Comment
           </Button>
         </Box>
-      </Box>
+      </Container>
+      <Modal isOpen={isEditBugOpen} onClose={onEditBugClose}>
+        <ModalOverlay />
+        <ModalContent p={5} pb={10}>
+          <ModalHeader>Edit Bug</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <EditBugForm
+              bug={bug}
+              bugCategories={project?.bugCategories}
+              onSuccess={() => {
+                queryClient.invalidateQueries("getBugData");
+                onEditBugClose();
+              }}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import { ChakraProvider, CSSReset } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query/devtools";
 import { BrowserRouter } from "react-router-dom";
 import Router from "./config/Router";
 import theme from "./config/theme";
@@ -17,7 +16,6 @@ const App = () => {
           </UserProvider>
         </BrowserRouter>
       </ChakraProvider>
-      <ReactQueryDevtools />
     </QueryClientProvider>
   );
 };
