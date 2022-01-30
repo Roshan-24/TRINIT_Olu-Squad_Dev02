@@ -262,7 +262,7 @@ function Project() {
                   <VStack>
                     {pendingBugs &&
                       pendingBugs.map(item => (
-                        <Link to={"/bugs/" + item.id} style={{ width: "100%" }}>
+                        <Link key={item.id} to={"/bugs/" + item.id} style={{ width: "100%" }}>
                           <KanbanItem2 data={{ name: item.name }} />
                         </Link>
                       ))}
@@ -320,7 +320,7 @@ function Project() {
                 </ModalBody>
               </ModalContent>
             </Modal>
-          	{isProjectAdmin && (
+            {isProjectAdmin && (
               <Popover
                 isOpen={isPopoverOpen}
                 onOpen={() => {

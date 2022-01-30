@@ -64,7 +64,7 @@ const Navbar = () => {
         </Link>
         {isLargerThanSm && (
           <HStack spacing={0} pl={4}>
-            {/* {navItems
+            {navItems
               .filter(navItem => navItem.mainNav)
               .map((navItem, idx) => (
                 <Link to={navItem.href} key={idx}>
@@ -72,12 +72,7 @@ const Navbar = () => {
                     {navItem.name}
                   </Button>
                 </Link>
-              ))} */}
-            <Link to={"/organizations"}>
-              <Button fontWeight={"normal"} variant={"ghost"}>
-                Orgs
-              </Button>
-            </Link>
+              ))}
           </HStack>
         )}
         <Spacer />

@@ -1,6 +1,6 @@
 const navItems = [
   {
-    name: "Orgs",
+    name: "Organizations",
     href: "/organizations",
     mainNav: true,
     dropdown: true
