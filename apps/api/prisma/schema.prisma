@@ -18,6 +18,7 @@ model User {
   password            String
   firstName           String
   lastName            String
+  address             String
   organizationsOwned  Organization[] @relation("Org_Owners")
   organizationMembers Organization[] @relation("Org_Members")
   projectsOwned       Project[]      @relation("Project_adminToUser")
@@ -46,6 +47,7 @@ model Project {
   description    String
   organization   Organization  @relation(fields: [organizationId], references: [id])
   organizationId Int
+  projectLead    Int
   admins         User[]        @relation("Project_adminToUser")
   members        User[]        @relation("Project_memberToUser")
   bugCategories  BugCategory[]
