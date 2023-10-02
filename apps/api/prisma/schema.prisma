@@ -18,6 +18,7 @@ model User {
   password            String
   firstName           String
   lastName            String
+  address             String
   organizationsOwned  Organization[] @relation("Org_Owners")
   organizationMembers Organization[] @relation("Org_Members")
   projectsOwned       Project[]      @relation("Project_adminToUser")
